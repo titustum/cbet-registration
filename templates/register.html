@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md my-8">
+    <div class="border-b border-gray-200 pb-4 mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Student Registration</h1>
+        <p class="text-gray-600 mt-1">Complete the form below to register a new student</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="p-4 mb-6 rounded {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-6">
+        {{ form.hidden_tag() }}
+
+        <div class="space-y-1">
+            {{ form.admission_number.label(class_="block text-sm font-medium text-gray-700") }}
+            {{ form.admission_number(class_="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500") }}
+            {% if form.admission_number.errors %}
+                <span class="text-red-600 text-sm">{{ form.admission_number.errors[0] }}</span>
+            {% endif %}
+        </div>
+
+        <div class="space-y-1">
+            {{ form.fullname.label(class_="block text-sm font-medium text-gray-700") }}
+            {{ form.fullname(class_="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500") }}
+            {% if form.fullname.errors %}
+                <span class="text-red-600 text-sm">{{ form.fullname.errors[0] }}</span>
+            {% endif %}
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-1">
+                {{ form.department.label(class_="block text-sm font-medium text-gray-700") }}
+                {{ form.department(class_="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500", id="department") }}
+                {% if form.department.errors %}
+                    <span class="text-red-600 text-sm">{{ form.department.errors[0] }}</span>
+                {% endif %}
+            </div>
+
+            <div class="space-y-1">
+                {{ form.course.label(class_="block text-sm font-medium text-gray-700") }}
+                {{ form.course(class_="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500", id="course") }}
+                {% if form.course.errors %}
+                    <span class="text-red-600 text-sm">{{ form.course.errors[0] }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-1">
+                {{ form.classroom.label(class_="block text-sm font-medium text-gray-700") }}
+                {{ form.classroom(class_="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500") }}
+                {% if form.classroom.errors %}
+                    <span class="text-red-600 text-sm">{{ form.classroom.errors[0] }}</span>
+                {% endif %}
+            </div>
+            <div class="space-y-1">
+                {{ form.level.label(class_="block text-sm font-medium text-gray-700") }}
+                {{ form.level(class_="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500") }}
+                {% if form.level.errors %}
+                    <span class="text-red-600 text-sm">{{ form.level.errors[0] }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <label for="profile_image" class="block text-sm font-medium text-gray-700">Profile Image</label>
+            <input type="file" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" id="profile_image" name="profile_image" accept="image/*">
+            <div class="mt-2">
+                <img id="image_preview" src="#" alt="Profile Image Preview" class="hidden rounded-full w-24 h-24 object-cover shadow-md">
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-4">
+            <a href="{{ url_for('login') }}" class="text-blue-600 hover:text-blue-800">Login</a>
+            {{ form.submit(class_="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out") }}
+        </div>
+    </form>
+</div>
+
+<script>
+    const departmentSelect = document.getElementById('department');
+    const courseSelect = document.getElementById('course');
+
+    departmentSelect.addEventListener('change', function() {
+    const departmentId = this.value;
+    courseSelect.innerHTML = '<option value="">-- Select Course --</option>';
+
+    if (departmentId) {
+        fetch(`/get_courses/${departmentId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(courses => {
+                if (Array.isArray(courses)) {
+                    courses.forEach(course => {
+                        const option = document.createElement('option');
+                        option.value = course.id;
+                        option.textContent = course.name;
+                        courseSelect.appendChild(option);
+                    });
+                } else {
+                    console.error('Unexpected response format:', courses);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching courses:', error);
+            });
+    }
+});
+</script>
+
+<script>
+    const profileImageInput = document.getElementById('profile_image');
+    const imagePreview = document.getElementById('image_preview');
+
+    profileImageInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreview.classList.remove('hidden');
+            }
+            reader.readAsDataURL(file);
+        } else {
+            imagePreview.src = '#';
+            imagePreview.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}

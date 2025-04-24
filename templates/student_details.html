@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md my-8">
+    <div class="border-b border-gray-200 pb-4 mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Student Details</h1>
+        <p class="text-gray-600 mt-1">Details for student: <span class="font-semibold">{{ student.fullname }}</span></p>
+    </div>
+
+    <div class="space-y-4">
+        <div class="flex items-center space-x-4">
+            {% if student.profile_image %}
+                <img src="{{ url_for('static', filename=student.profile_image) }}" alt="{{ student.fullname }}'s Profile Image" class="rounded-full h-24 w-24 object-cover shadow-md">
+            {% else %}
+                <div class="rounded-full h-24 w-24 bg-gray-300 flex items-center justify-center">
+                    <span class="text-gray-500">No Image</span>
+                </div>
+            {% endif %}
+            <div>
+                <h2 class="text-xl font-semibold text-gray-700">{{ student.fullname }}</h2>
+                <p class="text-gray-500">Admission Number: {{ student.admission_number }}</p>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 p-4 rounded-md">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Personal Information</h3>
+            <p><span class="font-medium text-gray-700">Full Name:</span> {{ student.fullname }}</p>
+            <p><span class="font-medium text-gray-700">Admission Number:</span> {{ student.admission_number }}</p>
+        </div>
+
+        <div class="bg-gray-50 p-4 rounded-md">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Academic Details</h3>
+            <p><span class="font-medium text-gray-700">Department:</span> {{ student.department.name if student.department else 'N/A' }}</p>
+            <p><span class="font-medium text-gray-700">Course:</span> {{ student.course.name if student.course else 'N/A' }}</p>
+            <p><span class="font-medium text-gray-700">Classroom:</span> {{ student.classroom if student.classroom else 'N/A' }}</p>
+            <p><span class="font-medium text-gray-700">Level:</span> {{ student.level if student.level else 'N/A' }}</p>
+        </div>
+
+        <div class="mt-6">
+            <a href="{{ url_for('students_list') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Back to Student List
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md my-8">
+    <div class="border-b border-gray-200 pb-4 mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Add New Course</h1>
+        <p class="text-gray-600 mt-1">Select a department and enter the name of the new course.</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="p-4 mb-4 rounded {% if category == 'error' %}bg-red-100 text-red-700{% elif category == 'warning' %}bg-yellow-100 text-yellow-700{% else %}bg-green-100 text-green-700{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" class="space-y-4">
+        {{ form.hidden_tag() }}
+
+        <div class="space-y-1">
+            {{ form.department.label(class_="block text-sm font-medium text-gray-700") }}
+            {{ form.department(class_="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500") }}
+            {% if form.department.errors %}
+                <span class="text-red-600 text-sm">{{ form.department.errors[0] }}</span>
+            {% endif %}
+        </div>
+
+        <div class="space-y-1">
+            {{ form.coursename.label(class_="block text-sm font-medium text-gray-700") }}
+            {{ form.coursename(class_="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500") }}
+            {% if form.coursename.errors %}
+                <span class="text-red-600 text-sm">{{ form.coursename.errors[0] }}</span>
+            {% endif %}
+        </div>
+
+        {{ form.submit(class_="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md shadow-sm transition duration-150 ease-in-out") }}
+    </form>
+
+    <div class="mt-6">
+        <a href="{{ url_for('admin_dashboard') }}" class="text-blue-600 hover:text-blue-800">Back to Admin Dashboard</a>
+    </div>
+</div>
+{% endblock %}

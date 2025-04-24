@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-6">
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white p-6 rounded-lg shadow">
+        <div class="flex space-x-3">
+            <div >
+                <img src="{{ url_for('static', filename=student.profile_image or '') }}" 
+                alt="profile_image" 
+                class="h-20 w-20 object-cover object-center rounded-full border">
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Welcome, {{ student.fullname }}</h2>
+                <p class="text-gray-600 mt-1">Student ID: {{ student.admission_number }}</p>
+                <p class="text-gray-600">{{ student.department.name }} - {{ student.course.name }}</p>
+                <p class="text-gray-600">{{ student.level }} - {{ student.classroom }}</p>
+                <a href="{{ url_for('logout') }}" class="text-red-500 mt-4 hover:text-red-700">Logout</a>
+            </div>
+            
+        </div>
+        <div class="mt-4 sm:mt-0 flex flex-col sm:flex-row gap-2">
+            <button onclick="openModal('addUnit', false)" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition duration-150 ease-in-out flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Register New Unit
+            </button>
+            <button onclick="openModal('addUnit', true)" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md transition duration-150 ease-in-out flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                </svg>
+                Register Reassessment
+            </button>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="p-4 mb-6 rounded-md {% if category == 'error' %}bg-red-100 text-red-700 border border-red-200{% else %}bg-green-100 text-green-700 border border-green-200{% endif %} flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        {% if category == 'error' %}
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        {% else %}
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        {% endif %}
+                    </svg>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Registration Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">New Assessment Units</h3>
+                <span class="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full font-medium">{{ new_units|length }} Unit(s)</span>
+            </div>
+            {% if new_units %}
+                <ul class="divide-y divide-gray-200">
+                    {% for unit in new_units %}
+                        <li class="py-3 flex justify-between items-center">
+                            <div>
+                                <p class="font-medium">{{ unit.unit_name }}</p>
+                                {% if unit.unit_code %}
+                                    <p class="text-sm text-gray-500">Code: {{ unit.unit_code }}</p>
+                                {% endif %}
+                            </div>
+                            <form method="POST" action="{{ url_for('remove_unit', unit_id=unit.id) }}" class="inline">
+                                <button type="submit" class="text-red-600 hover:text-red-800" onclick="return confirm('Are you sure you want to remove this unit?')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="text-center py-6 text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p>No new assessment units registered</p>
+                    <button onclick="openModal('addUnit', false)" class="mt-2 text-blue-600 hover:underline">Add your first unit</button>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">Reassessment Units</h3>
+                <span class="bg-yellow-100 text-yellow-800 text-sm px-3 py-1 rounded-full font-medium">{{ reassessments|length }} Unit(s)</span>
+            </div>
+            {% if reassessments %}
+                <ul class="divide-y divide-gray-200">
+                    {% for unit in reassessments %}
+                        <li class="py-3 flex justify-between items-center">
+                            <div>
+                                <p class="font-medium">{{ unit.unit_name }}</p>
+                                {% if unit.unit_code %}
+                                    <p class="text-sm text-gray-500">Code: {{ unit.unit_code }}</p>
+                                {% endif %}
+                            </div>
+                            <form method="POST" action="{{ url_for('remove_unit', unit_id=unit.id) }}" class="inline">
+                                <button type="submit" class="text-red-600 hover:text-red-800" onclick="return confirm('Are you sure you want to remove this reassessment?')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="text-center py-6 text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <p>No reassessment units registered</p>
+                    <button onclick="openModal('addUnit', true)" class="mt-2 text-blue-600 hover:underline">Register a reassessment</button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="unitModal" class="hidden fixed inset-0 bg-black/50 z-50 flex justify-center items-center p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md relative overflow-hidden">
+            <div class="p-6">
+                <h3 id="modalTitle" class="text-xl font-bold text-gray-800 mb-4">Register Unit</h3>
+                <form method="POST" action="{{ url_for('add_unit') }}" class="space-y-4">
+                    <input type="hidden" name="is_reassessment" id="is_reassessment" value="false">
+                    
+                    <div class="space-y-2">
+                        <label for="unit_name" class="block text-sm font-medium text-gray-700">Unit Name</label>
+                        <input type="text" name="unit_name" id="unit_name" required 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label for="unit_code" class="block text-sm font-medium text-gray-700">Unit Code (Optional)</label>
+                        <input type="text" name="unit_code" id="unit_code" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="closeModal()" 
+                                class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            Cancel
+                        </button>
+                        <button type="submit" id="submitBtn"
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Add Unit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function openModal(modalId, reassess = false) {
+        document.getElementById('is_reassessment').value = reassess;
+        document.getElementById('modalTitle').innerText = reassess ? 'Register Reassessment Unit' : 'Register New Unit';
+        document.getElementById('submitBtn').innerText = reassess ? 'Add Reassessment' : 'Add Unit';
+        document.getElementById('unitModal').classList.remove('hidden');
+        document.getElementById('unit_name').focus();
+        
+        // Prevent background scrolling
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeModal() {
+        document.getElementById('unitModal').classList.add('hidden');
+        document.getElementById('unit_name').value = '';
+        document.getElementById('unit_code').value = '';
+        
+        // Re-enable background scrolling
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Close modal on escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeModal();
+        }
+    });
+    
+    // Close modal when clicking outside
+    document.getElementById('unitModal').addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeModal();
+        }
+    });
+    </script>
+{% endblock %}
