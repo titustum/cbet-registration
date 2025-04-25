@@ -3,8 +3,13 @@
 {% block content %}
 <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md my-8">
     <div class="border-b border-gray-200 pb-4 mb-6">
+        <div class="py-2">
+            <img src="{{ url_for('static', filename="images/logo.jpeg") }}" alt="logo" 
+                class="h-20 mx-auto">
+        </div>
         <h1 class="text-3xl font-bold text-gray-800">Student Registration</h1>
-        <p class="text-gray-600 mt-1">Complete the form below to register a new student</p>
+        <p class="text-gray-600 mt-1">Complete the form below to register for CDACC July 2025 Series</p>
+        <i class="mt-2 text-sm text-yellow-500">NB: Registering here without paying fees does not account to full registration</i>
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
