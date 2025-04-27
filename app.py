@@ -162,7 +162,9 @@ def students_list():
 @app.route('/students/<int:student_id>')
 def student_details(student_id):
     student = Student.query.get_or_404(student_id)
-    return render_template('student_details.html', student=student)
+    new_units = UnitRegistration.query.filter_by(student_id=student_id, is_reassessment=False).all()
+    reassessments = UnitRegistration.query.filter_by(student_id=student_id, is_reassessment=True).all()
+    return render_template('student_details.html', student=student, new_units=new_units, reassessments=reassessments)
 
 
 @app.route('/add_course', methods=['GET', 'POST'])
