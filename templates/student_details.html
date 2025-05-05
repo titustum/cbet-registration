@@ -2,99 +2,111 @@
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 py-6">
     <!-- Header Section -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white p-6 rounded-lg shadow">
+    <div
+        class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 bg-white p-6 rounded-lg shadow print:shadow-none">
         <div class="flex space-x-3">
-            <div >
+            <div>
                 {% if student.profile_image %}
-                <img src="{{ url_for('static', filename=student.profile_image) }}" 
-                alt="{{ student.fullname }}'s Profile Image" class="rounded-full 
+                <img src="{{ url_for('static', filename=student.profile_image) }}"
+                    alt="{{ student.fullname }}'s Profile Image" class="rounded-full 
                 h-20 w-20 object-cover shadow-md">
-            {% else %}
+                {% else %}
                 <div class="rounded-full h-20 w-20 bg-gray-300 flex items-center justify-center">
                     <span class="text-gray-500">No Image</span>
                 </div>
-            {% endif %}
+                {% endif %}
 
             </div>
             <div>
                 <h2 class="text-2xl font-bold text-gray-800">Welcome, {{ student.fullname }}</h2>
                 <p class="text-gray-600 mt-1">Student ID: {{ student.admission_number }}</p>
                 <p class="text-gray-600">{{ student.department.name }} - {{ student.course.name }}</p>
-                <p class="text-gray-600">{{ student.level }} - {{ student.classroom }}</p> 
-                
+                <p class="text-gray-600">{{ student.level }} - {{ student.classroom }}</p>
+
             </div>
-            
+
         </div>
         <div class="mt-4 sm:mt-0 flex flex-col sm:flex-row gap-2">
-            <a href="{{ url_for('students_list') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition duration-150 ease-in-out flex items-center justify-center">
-                Back to Student List &rarr;
-            </a> 
+            <a href="{{ url_for('students_list') }}"
+                class="print:hidden bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition duration-150 ease-in-out flex items-center justify-center">
+                Back &rarr;
+            </a>
+            <button onclick="window.print()"
+                class="print:hidden bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition duration-150 ease-in-out flex items-center justify-center">
+                Print 🖶
+            </button>
         </div>
     </div>
- 
+
 
     <!-- Registration Summary Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div class="bg-white p-6 rounded-lg shadow">
+        <div class="bg-white p-6 rounded-lg shadow print:shadow-none print:border">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-800">New Assessment Units</h3>
-                <span class="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full font-medium">{{ new_units|length }} Unit(s)</span>
+                <h3 class="text-lg font-bold text-gray-800">Assessment Units</h3>
+                <span class="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full font-medium">{{ new_units|length
+                    }} Unit(s)</span>
             </div>
             {% if new_units %}
-                <ul class="divide-y divide-gray-200">
-                    {% for unit in new_units %}
-                        <li class="py-3 flex justify-between items-center">
-                            <div>
-                                <p class="font-medium">{{ unit.unit_name }}</p>
-                                {% if unit.unit_code %}
-                                    <p class="text-sm text-gray-500">Code: {{ unit.unit_code }}</p>
-                                {% endif %}
-                            </div>
-                             
-                        </li>
-                    {% endfor %}
-                </ul>
+            <ul class="divide-y divide-gray-200">
+                {% for unit in new_units %}
+                <li class="py-3 flex justify-between items-center">
+                    <div>
+                        <p class="font-medium">{{ unit.unit_name }}</p>
+                        {% if unit.unit_code %}
+                        <p class="text-sm text-gray-500">Code: {{ unit.unit_code }}</p>
+                        {% endif %}
+                    </div>
+
+                </li>
+                {% endfor %}
+            </ul>
             {% else %}
-                <div class="text-center py-6 text-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <p>No new assessment units registered</p>
-                     
-                </div>
+            <div class="text-center py-6 text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2 text-gray-400" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p>No new assessment units registered</p>
+
+            </div>
             {% endif %}
         </div>
 
-        <div class="bg-white p-6 rounded-lg shadow">
+        <div class="bg-white p-6 rounded-lg shadow print:shadow-none print:border">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-800">Reassessment Units</h3>
-                <span class="bg-yellow-100 text-yellow-800 text-sm px-3 py-1 rounded-full font-medium">{{ reassessments|length }} Unit(s)</span>
+                <span class="bg-yellow-100 text-yellow-800 text-sm px-3 py-1 rounded-full font-medium">{{
+                    reassessments|length }} Unit(s)</span>
             </div>
             {% if reassessments %}
-                <ul class="divide-y divide-gray-200">
-                    {% for unit in reassessments %}
-                        <li class="py-3 flex justify-between items-center">
-                            <div>
-                                <p class="font-medium">{{ unit.unit_name }}</p>
-                                {% if unit.unit_code %}
-                                    <p class="text-sm text-gray-500">Code: {{ unit.unit_code }}</p>
-                                {% endif %}
-                            </div>
-                             
-                        </li>
-                    {% endfor %}
-                </ul>
+            <ul class="divide-y divide-gray-200">
+                {% for unit in reassessments %}
+                <li class="py-3 flex justify-between items-center">
+                    <div>
+                        <p class="font-medium">{{ unit.unit_name }}</p>
+                        {% if unit.unit_code %}
+                        <p class="text-sm text-gray-500">Code: {{ unit.unit_code }}</p>
+                        {% endif %}
+                    </div>
+
+                </li>
+                {% endfor %}
+            </ul>
             {% else %}
-                <div class="text-center py-6 text-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    <p>No reassessment units registered</p>
-                    
-                </div>
+            <div class="text-center py-6 text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2 text-gray-400" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <p>No reassessment units registered</p>
+
+            </div>
             {% endif %}
         </div>
     </div>
-  
- 
-{% endblock %}
+
+
+    {% endblock %}
